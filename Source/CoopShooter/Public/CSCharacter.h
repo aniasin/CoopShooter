@@ -38,7 +38,7 @@ protected:
 	void Fire();
 	void StopFire();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UPROPERTY(Replicated)
 		class ACSWeapon* CurrentWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
@@ -50,6 +50,7 @@ protected:
 		void OnHealthChanged(USCHealthComponent* HealthComponent, float CurrentHealth, float HealthDelta,
 			const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -59,7 +60,7 @@ public:
 
 	virtual FVector GetPawnViewLocation() const override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Event")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Event")
 	bool bIsDead;
 
 private:

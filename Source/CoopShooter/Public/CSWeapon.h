@@ -6,6 +6,21 @@
 #include "GameFramework/Actor.h"
 #include "CSWeapon.generated.h"
 
+// Contains information of a single hitscan weapon linetrace
+USTRUCT()
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+		TEnumAsByte<EPhysicalSurface> SurfaceType;
+
+	UPROPERTY()
+		FVector_NetQuantize TraceTo;
+};
+
 UCLASS()
 class COOPSHOOTER_API ACSWeapon : public AActor
 {
@@ -37,11 +52,14 @@ protected:
 		class UParticleSystem* DefaultImpactEffect;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		class UParticleSystem* FleshImpactEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+		class UParticleSystem* ExplosiveImpactEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		class UParticleSystem* TracerEffect;
 
 	void PlayFireEffects(FVector Endpoint);
+	void PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class UCameraShake> FireCameraShake;
@@ -58,6 +76,14 @@ protected:
 	// Derived from RateOfFire
 	float TimeBetweenShots;
 
+	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
+		FHitScanTrace HitScanTrace;
+
+	UFUNCTION()
+		void OnRep_HitScanTrace();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void ServerFire();
 	void Fire();
 
 	FTimerHandle FireTimerHandle;

@@ -13,6 +13,8 @@
 #include "GameFramework/DamageType.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Controller.h"
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values
 ACSCharacter::ACSCharacter()
@@ -40,20 +42,21 @@ void ACSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ACSCharacter::OnHealthChanged);
 	DefaultFov = Camera->FieldOfView;
 
+	if (GetLocalRole() == ROLE_Authority)
+	{
 	// Spawn a default Weapon
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	CurrentWeapon = GetWorld()->SpawnActor<ACSWeapon>(StarterWeaponClass, FVector(0, 0, 0), FRotator(0, 0, 0), SpawnParams);
-	if (CurrentWeapon)
-	{
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
-		CurrentWeapon->SetOwner(this);
-	}
-	if (HealthComp)
-	{
-		HealthComp->OnHealthChanged.AddDynamic(this, &ACSCharacter::OnHealthChanged);
+		if (CurrentWeapon)
+		{
+			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
+			CurrentWeapon->SetOwner(this);
+		}
 	}
 }
 
@@ -112,7 +115,6 @@ void ACSCharacter::StopFire()
 void ACSCharacter::OnHealthChanged(USCHealthComponent* HealthComponent, float CurrentHealth, float HealthDelta,
 	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Took %s Damage"), *FString::SanitizeFloat(HealthDelta))
 		if (CurrentHealth <= 0 || bIsDead)
 		{
 			bIsDead = true;
@@ -161,3 +163,9 @@ FVector ACSCharacter::GetPawnViewLocation() const
 	return Super::GetPawnViewLocation();
 }
 
+void ACSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACSCharacter, CurrentWeapon);
+	DOREPLIFETIME(ACSCharacter, bIsDead);
+}
