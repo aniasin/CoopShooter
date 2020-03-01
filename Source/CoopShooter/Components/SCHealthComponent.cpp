@@ -11,12 +11,13 @@ USCHealthComponent::USCHealthComponent()
 {
 	MaxHealth = 100.0f;
 
-	SetIsReplicated(true);
+
 }
 
 // Called when the game starts
 void USCHealthComponent::BeginPlay()
 {
+	SetIsReplicated(true);
 	Super::BeginPlay();
 
 	AActor* MyOwner = GetOwner();
@@ -34,9 +35,9 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 		if (Damage <= 0) { return; }
 
 		CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
-
-		UE_LOG(LogTemp, Log, TEXT("Health changed : %s"), *FString::SanitizeFloat(CurrentHealth));
 		OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
+
+		UE_LOG(LogTemp, Warning, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
 	}
 
 }

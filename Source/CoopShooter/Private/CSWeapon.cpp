@@ -156,8 +156,6 @@ void ACSWeapon::PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint)
 	switch (SurfaceType)
 	{
 	case SURFACE_FLESHDEFAULT:
-		SelectedEffect = DefaultImpactEffect;
-		break;
 	case SURFACE_FLESHVULNERABLE:
 		SelectedEffect = FleshImpactEffect;
 		break;
