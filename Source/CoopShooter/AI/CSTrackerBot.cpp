@@ -19,6 +19,8 @@
 #include "CoopShooter/Public/CSCharacter.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "EngineUtils.h"
+#include "Net/UnrealNetwork.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -50,6 +52,7 @@ ACSTrackerBot::ACSTrackerBot()
 	DamageRadius = 250;
 	Timer = 1;
 
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +61,10 @@ void ACSTrackerBot::BeginPlay()
 	Super::BeginPlay();
 	HealthComp->OnHealthChanged.AddDynamic(this, &ACSTrackerBot::HandleTakeDamage);
 	
-	NextPathPoint =  GetNextPathPoint();
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		NextPathPoint = GetNextPathPoint();
+	}
 }
 
 // Called every frame
@@ -66,7 +72,10 @@ void ACSTrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MoveToNextPoint();
+	if (GetLocalRole() == ROLE_Authority && !bExploded)
+	{
+		MoveToNextPoint();
+	}
 }
 
 void ACSTrackerBot::HandleTakeDamage(USCHealthComponent* HealthComponent, float CurrentHealth, float HealthDelta,
@@ -95,13 +104,33 @@ FVector ACSTrackerBot::GetNextPathPoint()
 		return GetActorLocation();
 	}
 
-	ACharacter* TargetActor = UGameplayStatics::GetPlayerCharacter(this, 0);
-	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), TargetActor);
-
-	if (NavPath->PathPoints.Num() > 1)
+	TArray<AActor*> SpottedPlayers;
+	TArray<ACSCharacter*>PlayersToSort;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSCharacter::StaticClass(), SpottedPlayers);
+	if (SpottedPlayers.Num() > 0)
 	{
-		return NavPath->PathPoints[1];
+		for (int32 i = 0; i < SpottedPlayers.Num(); i++)
+		{
+			float Distance = FVector::Distance(SpottedPlayers[i]->GetActorLocation(), GetActorLocation());
+			ACSCharacter* PlayerCharacter = Cast<ACSCharacter>(SpottedPlayers[i]);
+			PlayerCharacter->DistanceToQuerier = Distance;
+			PlayersToSort.Add(PlayerCharacter);
+		}
+		TArray<ACSCharacter*>PlayersSorted = SortPlayersByDistance(PlayersToSort);
+		BestTarget = PlayersSorted[0];
 	}
+
+	if (BestTarget)
+	{
+		UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), BestTarget);
+
+
+		if (NavPath->PathPoints.Num() > 1)
+		{
+			return NavPath->PathPoints[1];
+		}
+	}
+
 	return GetActorLocation();
 }
 
@@ -135,21 +164,25 @@ void ACSTrackerBot::SelfDestruct()
 		return;
 	}
 	bExploded = true;
-	TArray<AActor*>IgnoreActor;
-	IgnoreActor.Add(this);
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
 	AudioComp->SetVolumeMultiplier(0);
 	UGameplayStatics::PlaySoundAtLocation(this, SoundExplosion, GetActorLocation());
 
-	UGameplayStatics::ApplyRadialDamage(this, Damage, GetActorLocation(), DamageRadius, BotDamageType, IgnoreActor, this,
-		GetController(), true, COLLISION_WEAPON);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		TArray<AActor*>IgnoreActor;
+		IgnoreActor.Add(this);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 12, FColor::Red, false, 1, 0, 1);
+		UGameplayStatics::ApplyRadialDamage(this, Damage, GetActorLocation(), DamageRadius, BotDamageType, IgnoreActor, this,
+			GetController(), true, COLLISION_WEAPON);
 
-	GetWorldTimerManager().ClearAllTimersForObject(this);
-	DetachFromControllerPendingDestroy();
-	SetLifeSpan(10.0f);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 12, FColor::Red, false, 1, 0, 1);
+
+		GetWorldTimerManager().ClearAllTimersForObject(this);
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
+	}
 }
 
 void ACSTrackerBot::SelfDamage()
@@ -163,7 +196,11 @@ void ACSTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 	ACSCharacter* Player = Cast<ACSCharacter>(OtherActor);
 	if (Player && !bStartedSelfDestroy)
 	{
-		GetWorldTimerManager().SetTimer(BotTimerHandle, this, &ACSTrackerBot::SelfDamage, Timer, true, 0);
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			GetWorldTimerManager().SetTimer(BotTimerHandle, this, &ACSTrackerBot::SelfDamage, Timer, true, 0);
+		}
+
 		bStartedSelfDestroy = true;
 		UGameplayStatics::SpawnSoundAttached(SoundSpotted, RootComponent);
 	}
@@ -175,3 +212,14 @@ void ACSTrackerBot::NotifyActorEndOverlap(AActor* OtherActor)
 
 }
 
+// tools
+TArray<ACSCharacter*> ACSTrackerBot::SortPlayersByDistance(TArray<ACSCharacter*> PlayerToSort)
+{
+	auto SortPred = [](ACSCharacter& A, ACSCharacter& B)->bool
+	{
+		return(A.DistanceToQuerier) <= (B.DistanceToQuerier);
+	};
+	PlayerToSort.Sort(SortPred);
+
+	return PlayerToSort;
+}

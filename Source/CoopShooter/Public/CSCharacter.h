@@ -63,6 +63,8 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Event")
 	bool bIsDead;
 
+	float DistanceToQuerier;
+
 private:
 
 };

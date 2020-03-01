@@ -27,6 +27,13 @@ void USCHealthComponent::BeginPlay()
 	}
 	CurrentHealth = MaxHealth;}
 
+void USCHealthComponent::OnRep_Health(float OldHealth)
+{
+	float Damage = CurrentHealth - OldHealth;
+
+	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, nullptr, nullptr, nullptr);
+}
+
 void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
