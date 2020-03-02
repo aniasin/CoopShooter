@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CSCharacter.generated.h"
 
+
 UCLASS()
 class COOPSHOOTER_API ACSCharacter : public ACharacter
 {

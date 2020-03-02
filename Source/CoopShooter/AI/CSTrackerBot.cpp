@@ -193,6 +193,8 @@ void ACSTrackerBot::SelfDamage()
 
 void ACSTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorBeginOverlap(OtherActor);
+
 	ACSCharacter* Player = Cast<ACSCharacter>(OtherActor);
 	if (Player && !bStartedSelfDestroy)
 	{

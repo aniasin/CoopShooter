@@ -3,6 +3,7 @@
 
 #include "SCHealthComponent.h"
 #include "GameFramework/Actor.h"
+#include "CoopShooter/Public/CSCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -30,7 +31,6 @@ void USCHealthComponent::BeginPlay()
 void USCHealthComponent::OnRep_Health(float OldHealth)
 {
 	float Damage = CurrentHealth - OldHealth;
-
 	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, nullptr, nullptr, nullptr);
 }
 
