@@ -7,6 +7,8 @@
 // Sets default values
 ACSPowerUpActor::ACSPowerUpActor()
 {
+	SetReplicates(true);
+
 	PowerUpInterval = 0;
 	TotalNumberOfTicks = 0;
 
@@ -45,7 +47,7 @@ void ACSPowerUpActor::ActivatePowerUp()
 	}
 	else
 	{
-
+		OnTickPowerUp();
 	}
 }
 

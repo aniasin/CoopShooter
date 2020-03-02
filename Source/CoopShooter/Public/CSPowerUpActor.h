@@ -35,6 +35,7 @@ public:
 
 	void ActivatePowerUp();
 
+
 	class AActor* CurrentActor;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "PowerUps")

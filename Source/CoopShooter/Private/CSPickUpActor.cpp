@@ -6,6 +6,7 @@
 #include "Components/DecalComponent.h"
 #include "CoopShooter/Public/CSPowerUpActor.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 
 // Sets default values
@@ -20,9 +21,10 @@ ACSPickUpActor::ACSPickUpActor()
 	DecalComp->DecalSize = FVector(64,75,75);
 	DecalComp->SetRelativeRotation(FRotator(90, 0, 0));
 	DecalComp->SetupAttachment(RootComponent);
-	DecalComp->SetVisibility(false);
 
 	RespawnTime = 10;
+
+	SetReplicates(true);
 
 }
 
@@ -30,31 +32,31 @@ ACSPickUpActor::ACSPickUpActor()
 void ACSPickUpActor::BeginPlay()
 {
 	Super::BeginPlay();
+
 	Respawn();
+
 }
 
 
 void ACSPickUpActor::Respawn()
 {
-	DecalComp->SetVisibility(true);
-	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
-	PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorLocation(), GetActorRotation());
-
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorLocation(), GetActorRotation());
+		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+	}
 }
 
 void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	ACSCharacter* Player = Cast<ACSCharacter>(OtherActor);
-	if (Player)
+	if (!PowerUp) {	return;	}
+	if (GetLocalRole() == ROLE_Authority)
 	{
-		DecalComp->SetVisibility(false);
-
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ACSPickUpActor::Respawn, RespawnTime, false);
-		PowerUp->OnActivated(Player);
-		PowerUp->CurrentActor = Player;
+		PowerUp->CurrentActor = OtherActor;
 		PowerUp->ActivatePowerUp();
+		PowerUp->OnActivated(OtherActor);
 	}
-
 }
