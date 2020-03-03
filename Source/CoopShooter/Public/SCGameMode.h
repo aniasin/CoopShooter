@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "SCGameMode.generated.h"
 
+
+enum class EWaveState : uint8;
 /**
  * 
  */
@@ -19,8 +21,6 @@ public:
 
 protected:
 
-
-
 	UFUNCTION(BlueprintCallable, Category = "GameMode")
 	void StartWave();
 	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
@@ -31,6 +31,8 @@ protected:
 	void PrepareNextWave();
 
 	void CheckWaveState();
+
+	void SetWaveState(EWaveState NewWaveState);
 
 	FTimerHandle BotSpawnerTimerHandle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin = 1), Category = "Waves Settings")
