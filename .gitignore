@@ -2,6 +2,7 @@
 .vs/
 
 Content/AnimStarterPack/*
+Content/Maps/Blockout_P*
 
 # Visual Studio 2015 database file
 *.VC.db
