@@ -3,10 +3,28 @@
 
 #include "CSPowerUpActor.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/PointLightComponent.h"
 
 // Sets default values
 ACSPowerUpActor::ACSPowerUpActor()
 {
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
+	RootComponent = SceneComp;
+
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetupAttachment(RootComponent);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetRelativeLocation(FVector(0, 0, 40));
+	MeshComp->SetIsReplicated(true);
+
+	LightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("LightComp"));
+	LightComp->SetupAttachment(MeshComp);
+	LightComp->SetAttenuationRadius(200);
+	LightComp->CastShadows = false;
+	LightComp->SetIsReplicated(true);
+
+
 	SetReplicates(true);
 
 	PowerUpInterval = 0;
@@ -41,5 +59,7 @@ void ACSPowerUpActor::ActivatePowerUp()
 	{
 		OnTickPowerUp();
 	}
+	if (!MeshComp) { return; }
+	MeshComp->SetVisibility(false, true);
 }
 

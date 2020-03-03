@@ -16,6 +16,14 @@ public:
 	ACSPowerUpActor();
 
 protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		class USceneComponent* SceneComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		class UStaticMeshComponent* MeshComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		class UPointLightComponent* LightComp;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
 	float PowerUpInterval;
