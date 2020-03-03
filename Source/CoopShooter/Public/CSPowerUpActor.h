@@ -47,8 +47,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "PowerUps")
 	void OnActivated(AActor* Actor);
 	UFUNCTION(BlueprintImplementableEvent, Category = "PowerUps")
-	void OnExpired(AActor* Actor);
+	void OnExpired();
 	UFUNCTION(BlueprintImplementableEvent, Category = "PowerUps")
-	void OnPowerUpTicked(AActor* Actor);
+	void OnPowerUpTicked();
 
 };

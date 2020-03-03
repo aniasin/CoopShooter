@@ -36,11 +36,11 @@ void ACSPowerUpActor::OnTickPowerUp()
 {
 	TicksProcessed++;
 
-	OnPowerUpTicked(CurrentActor);
+	OnPowerUpTicked();
 
 	if (TicksProcessed >= TotalNumberOfTicks)
 	{
-		OnExpired(CurrentActor);
+		OnExpired();
 		GetWorld()->GetTimerManager().ClearTimer(PowerUpHandle);
 
 		Destroy();
