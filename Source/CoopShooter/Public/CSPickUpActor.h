@@ -27,7 +27,7 @@ UPROPERTY(VisibleAnywhere, Category = "Components")
 UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UDecalComponent* DecalComp;
 
-UPROPERTY(EditDefaultsOnly, Category = "PowerUp")
+UPROPERTY(EditAnywhere, Category = "PowerUp")
 float RespawnTime;
 UPROPERTY(EditAnywhere, Category = "PowerUp")
 TSubclassOf<class ACSPowerUpActor> PowerUpClass;

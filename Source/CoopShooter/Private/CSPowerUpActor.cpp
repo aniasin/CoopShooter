@@ -14,16 +14,6 @@ ACSPowerUpActor::ACSPowerUpActor()
 
 }
 
-// Called when the game starts or when spawned
-void ACSPowerUpActor::BeginPlay()
-{
-	Super::BeginPlay();
-
-
-
-	
-}
-
 void ACSPowerUpActor::OnTickPowerUp()
 {
 	TicksProcessed++;
@@ -41,6 +31,8 @@ void ACSPowerUpActor::OnTickPowerUp()
 
 void ACSPowerUpActor::ActivatePowerUp()
 {
+	OnActivated(CurrentActor);
+
 	if (PowerUpInterval > 0)
 	{
 		GetWorld()->GetTimerManager().SetTimer(PowerUpHandle, this, &ACSPowerUpActor::OnTickPowerUp, PowerUpInterval, true);

@@ -33,18 +33,27 @@ void ACSPickUpActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Respawn();
+	if (PowerUpClass == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No power up assigned in %s !"), *GetName())
+			return;
+	}
 
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		Respawn();
+	}
 }
 
 
 void ACSPickUpActor::Respawn()
 {
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorLocation(), GetActorRotation());
-		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
-	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorTransform(), SpawnParams);
+	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+
 }
 
 void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -57,6 +66,5 @@ void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ACSPickUpActor::Respawn, RespawnTime, false);
 		PowerUp->CurrentActor = OtherActor;
 		PowerUp->ActivatePowerUp();
-		PowerUp->OnActivated(OtherActor);
 	}
 }

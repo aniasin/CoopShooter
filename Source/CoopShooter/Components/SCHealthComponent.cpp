@@ -44,7 +44,7 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 		CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
 		OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
 
-		UE_LOG(LogTemp, Warning, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
 	}
 
 }
