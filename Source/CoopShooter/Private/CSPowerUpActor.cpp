@@ -27,7 +27,7 @@ ACSPowerUpActor::ACSPowerUpActor()
 
 	SetReplicates(true);
 
-	PowerUpInterval = 0;
+	PowerUpInterval = 10;
 	TotalNumberOfTicks = 0;
 
 }

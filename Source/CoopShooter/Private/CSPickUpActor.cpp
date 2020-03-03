@@ -51,6 +51,7 @@ void ACSPickUpActor::Respawn()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorTransform(), SpawnParams);
 	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
 
@@ -60,11 +61,18 @@ void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	if (!PowerUp) {	return;	}
-	if (GetLocalRole() == ROLE_Authority)
+	ACSCharacter* Player = Cast<ACSCharacter>(OtherActor);
+	if (Player)
 	{
-		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ACSPickUpActor::Respawn, RespawnTime, false);
-		PowerUp->CurrentActor = OtherActor;
-		PowerUp->ActivatePowerUp();
+		if (!PowerUp) { return; }
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ACSPickUpActor::Respawn, RespawnTime, false);
+			SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			PowerUp->CurrentActor = OtherActor;
+			PowerUp->ActivatePowerUp();
+		}
 	}
+
+
 }
