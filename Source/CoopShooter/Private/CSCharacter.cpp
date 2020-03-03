@@ -13,6 +13,7 @@
 #include "GameFramework/DamageType.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -161,6 +162,21 @@ FVector ACSCharacter::GetPawnViewLocation() const
 		return Camera->GetComponentLocation();
 	}
 	return Super::GetPawnViewLocation();
+}
+
+void ACSCharacter::ChangeMaxWalkSpeed(float NewSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+}
+
+void ACSCharacter::ClientChangeMaxWalkSpeed_Implementation(float NewSpeed)
+{
+	ChangeMaxWalkSpeed(NewSpeed);
+}
+
+bool ACSCharacter::ClientChangeMaxWalkSpeed_Validate(float NewSpeed)
+{
+	return true;
 }
 
 void ACSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const 

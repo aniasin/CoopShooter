@@ -64,7 +64,14 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Event")
 	bool bIsDead;
 
+	// Used to sort
 	float DistanceToQuerier;
+
+	UFUNCTION(BlueprintCallable, Category = "Event")
+	void ChangeMaxWalkSpeed(float NewSpeed);
+
+	UFUNCTION(Client, Reliable, WithValidation, BlueprintCallable, Category = "Event")
+		void ClientChangeMaxWalkSpeed(float NewSpeed);
 
 private:
 
