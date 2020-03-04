@@ -51,6 +51,8 @@ protected:
 
 private:
 
+	bool bIsGameOver;
+
 	int32 NumberOfBotsSpawned;
 	int32 CurrentNumberOfWaves;
 };

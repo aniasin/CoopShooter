@@ -5,6 +5,7 @@
 #include "CoopShooter/AI/CSTrackerBot.h"
 #include "Kismet/GameplayStatics.h"
 #include "CoopShooter/Public/CSGameStateBase.h"
+#include "CoopShooter/Public/CSCharacter.h"
 #include "Engine/World.h"
 
 ASCGameMode::ASCGameMode()
@@ -15,10 +16,12 @@ ASCGameMode::ASCGameMode()
 	NumberOfBots = 1;
 	TimeBetwinBots = 1;
 	TimeBetwinWaves = 1;
+	bIsGameOver = false;
 }
 
 void ASCGameMode::StartWave()
 {
+	if (bIsGameOver) { return; }
 	CurrentNumberOfWaves++;
 
 	if (CurrentNumberOfWaves >= NumberOfWaves + 1)
@@ -74,7 +77,38 @@ void ASCGameMode::CheckWaveState()
 
 void ASCGameMode::ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s KILLED %s"), *InstigatorController->GetPawn()->GetName(), *Victim->GetName())
+	ACSCharacter* Player = Cast<ACSCharacter>(Victim);
+	if (Player)
+	{
+		TArray<AActor*>Players;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSCharacter::StaticClass(), Players);
+		if (Players.Num() > 0)
+		{
+			// check if alive
+			for (int32 i = 0; i < Players.Num(); i++)
+			{
+				ACSCharacter* CurrentPlayer = Cast<ACSCharacter>(Players[i]);
+				if (CurrentPlayer)
+				{
+					AController* Controller = CurrentPlayer->GetController();
+					if (Controller)
+					{
+						break;
+					}
+					else
+					{
+						SetWaveState(EWaveState::GameOver);
+						GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+					}
+				}
+			}
+		}
+		else
+		{
+			SetWaveState(EWaveState::GameOver);
+			GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+		}
+	}
 }
 
 void ASCGameMode::SetWaveState(EWaveState NewWaveState)

@@ -181,7 +181,7 @@ void ACSTrackerBot::SelfDestruct()
 
 		GetWorldTimerManager().ClearAllTimersForObject(this);
 		DetachFromControllerPendingDestroy();
-		SetLifeSpan(10.0f);
+		SetLifeSpan(3.0f);
 	}
 }
 

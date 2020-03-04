@@ -123,7 +123,7 @@ void ACSCharacter::OnHealthChanged(USCHealthComponent* HealthComponent, float Cu
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 			DetachFromControllerPendingDestroy();
-			SetLifeSpan(10.0f);
+			SetLifeSpan(3);
 		}
 }
 
