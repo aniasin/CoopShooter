@@ -43,6 +43,7 @@ void ACSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!ensure(HealthComp)) { return; }
 
 	HealthComp->OnHealthChanged.AddDynamic(this, &ACSCharacter::OnHealthChanged);
 	DefaultFov = Camera->FieldOfView;

@@ -14,6 +14,8 @@ ASCGameMode::ASCGameMode()
 	GameStateClass = ACSGameStateBase::StaticClass();
 	PlayerStateClass = ACSPlayerState::StaticClass();
 
+	
+
 	NumberOfWaves = 1;
 	NumberOfBots = 1;
 	TimeBetwinBots = 1;

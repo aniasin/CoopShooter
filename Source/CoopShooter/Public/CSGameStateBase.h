@@ -29,11 +29,12 @@ public:
 		EWaveState WaveState;
 
 	void SetWaveState(EWaveState NewWaveState);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "GameState")
+		void WaveStateChanged(EWaveState NewState, EWaveState OldState);
 	
 protected:
 
 	UFUNCTION()
 	void OnRep_WaveState(EWaveState OldState);
-	UFUNCTION(BlueprintImplementableEvent, Category = "GameState")
-	void WaveStateChanged(EWaveState NewState, EWaveState OldState);
 };

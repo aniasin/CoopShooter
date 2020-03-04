@@ -3,6 +3,11 @@
 
 #include "CSPlayerState.h"
 
+ACSPlayerState::ACSPlayerState()
+{
+	
+}
+
 void ACSPlayerState::AddScore(float ScoreDelta)
 {
 	Score += ScoreDelta;

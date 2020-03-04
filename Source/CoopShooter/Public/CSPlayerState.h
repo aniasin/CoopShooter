@@ -15,6 +15,7 @@ class COOPSHOOTER_API ACSPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
+	ACSPlayerState();
 
 	UFUNCTION(BlueprintCallable, Category = "Player State")
 		void AddScore(float ScoreDelta);
