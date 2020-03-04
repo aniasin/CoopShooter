@@ -23,13 +23,13 @@ void ASCGameMode::StartWave()
 
 	if (CurrentNumberOfWaves >= NumberOfWaves + 1)
 	{
-		SetWaveState(EWaveState::WaveInProgress);
 		GetWorld()->GetTimerManager().ClearTimer(BotSpawnerTimerHandle);
-		GetWorld()->GetTimerManager().ClearTimer(TimeBetwinWaveTimerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(TimeBetwinCheckWaveState);
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimer(BotSpawnerTimerHandle, this, &ASCGameMode::SpawnNextBot, TimeBetwinBots, true, 0);
+		SetWaveState(EWaveState::PreparingNextWave);
+		GetWorld()->GetTimerManager().SetTimer(BotSpawnerTimerHandle, this, &ASCGameMode::SpawnNextBot, TimeBetwinBots, true, TimeBetwinWaves);
 	}
 }
 
@@ -39,7 +39,7 @@ void ASCGameMode::EndWave()
 	NumberOfBots++;
 	GetWorld()->GetTimerManager().ClearTimer(BotSpawnerTimerHandle);
 
-	GetWorld()->GetTimerManager().SetTimer(TimeBetwinWaveTimerHandle, this, &ASCGameMode::CheckWaveState, TimeBetwinWaves, true, 0);
+	GetWorld()->GetTimerManager().SetTimer(TimeBetwinCheckWaveState, this, &ASCGameMode::CheckWaveState, 1, true);
 }
 
 void ASCGameMode::SpawnNextBot()
@@ -50,10 +50,11 @@ void ASCGameMode::SpawnNextBot()
 	{
 		EndWave();
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("Current WaveNumbr = %s"), *FString::FromInt(CurrentNumberOfWaves))
-
-	SPawnNewBot();
+	else
+	{
+		SetWaveState(EWaveState::WaveInProgress);
+		SPawnNewBot();
+	}
 }
 
 void ASCGameMode::CheckWaveState()
@@ -65,9 +66,15 @@ void ASCGameMode::CheckWaveState()
 
 	if (TrackerBots.Num() <= 0)
 	{
+		GetWorld()->GetTimerManager().ClearTimer(TimeBetwinCheckWaveState);
 		StartWave();
 	}
 
+}
+
+void ASCGameMode::ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s KILLED %s"), *InstigatorController->GetPawn()->GetName(), *Victim->GetName())
 }
 
 void ASCGameMode::SetWaveState(EWaveState NewWaveState)

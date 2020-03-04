@@ -4,6 +4,7 @@
 #include "SCHealthComponent.h"
 #include "GameFramework/Actor.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "CoopShooter/Public/SCGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -21,10 +22,13 @@ void USCHealthComponent::BeginPlay()
 	SetIsReplicated(true);
 	Super::BeginPlay();
 
-	AActor* MyOwner = GetOwner();
-	if (MyOwner)
+	if (GetOwner()->GetLocalRole() == ROLE_Authority)
 	{
-		MyOwner->OnTakeAnyDamage.AddDynamic(this, &USCHealthComponent::HandleTakeAnyDamage);
+		AActor* MyOwner = GetOwner();
+		if (MyOwner)
+		{
+			MyOwner->OnTakeAnyDamage.AddDynamic(this, &USCHealthComponent::HandleTakeAnyDamage);
+		}
 	}
 	CurrentHealth = MaxHealth;}
 
@@ -37,14 +41,21 @@ void USCHealthComponent::OnRep_Health(float OldHealth)
 void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (GetOwner()->GetLocalRole() == ROLE_Authority)
+
+	if (Damage <= 0 || CurrentHealth <= 0) { return; }
+
+	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
+	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
+
+	UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
+
+	if (CurrentHealth <= 0)
 	{
-		if (Damage <= 0) { return; }
-
-		CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
-		OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
-
-		UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
+		ASCGameMode* GM = Cast<ASCGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->ActorKilled(DamageCauser, DamagedActor, InstigatedBy);
+		}
 	}
 
 }

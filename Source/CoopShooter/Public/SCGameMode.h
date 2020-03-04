@@ -19,6 +19,8 @@ class COOPSHOOTER_API ASCGameMode : public AGameModeBase
 public:
 	ASCGameMode();
 
+	void ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController);
+
 protected:
 
 	UFUNCTION(BlueprintCallable, Category = "GameMode")
@@ -38,7 +40,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin = 1), Category = "Waves Settings")
 	float TimeBetwinBots;
 
-	FTimerHandle TimeBetwinWaveTimerHandle;
+	FTimerHandle TimeBetwinCheckWaveState;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin = 1), Category = "Waves Settings")
 	float TimeBetwinWaves;
 
