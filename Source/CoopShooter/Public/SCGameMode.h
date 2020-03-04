@@ -19,7 +19,11 @@ class COOPSHOOTER_API ASCGameMode : public AGameModeBase
 public:
 	ASCGameMode();
 
+	UFUNCTION(BlueprintCallable, Category = "GameMode")
 	void ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
+		void K2_ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController);
 
 protected:
 
@@ -31,6 +35,10 @@ protected:
 	void EndWave();
 	void SpawnNextBot();
 	void PrepareNextWave();
+
+	void RestartDeadPlayers();
+
+	FTimerHandle ResPawnPlayer_TimerHandle;
 
 	void CheckWaveState();
 
@@ -48,6 +56,9 @@ protected:
 		int32 NumberOfBots;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin = 1), Category = "Waves Settings")
 		int32 NumberOfWaves;
+
+	void CheckGameOver();
+	void GameOver();
 
 private:
 

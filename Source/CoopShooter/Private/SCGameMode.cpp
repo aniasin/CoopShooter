@@ -6,11 +6,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "CoopShooter/Public/CSGameStateBase.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "CoopShooter/Public/CSPlayerState.h"
 #include "Engine/World.h"
 
 ASCGameMode::ASCGameMode()
 {
 	GameStateClass = ACSGameStateBase::StaticClass();
+	PlayerStateClass = ACSPlayerState::StaticClass();
 
 	NumberOfWaves = 1;
 	NumberOfBots = 1;
@@ -77,38 +79,31 @@ void ASCGameMode::CheckWaveState()
 
 void ASCGameMode::ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController)
 {
+
 	ACSCharacter* Player = Cast<ACSCharacter>(Victim);
+	// Victim is Player
 	if (Player)
 	{
-		TArray<AActor*>Players;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSCharacter::StaticClass(), Players);
-		if (Players.Num() > 0)
+		CheckGameOver();
+	}
+	// Victim is Bot
+	else
+	{
+		K2_ActorKilled(Killer, Victim, InstigatorController);
+	}
+}
+
+void ASCGameMode::RestartDeadPlayers()
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
+	{
+		APlayerController* PC = It->Get();
+		if (PC && PC->GetPawn() == nullptr)
 		{
-			// check if alive
-			for (int32 i = 0; i < Players.Num(); i++)
-			{
-				ACSCharacter* CurrentPlayer = Cast<ACSCharacter>(Players[i]);
-				if (CurrentPlayer)
-				{
-					AController* Controller = CurrentPlayer->GetController();
-					if (Controller)
-					{
-						break;
-					}
-					else
-					{
-						SetWaveState(EWaveState::GameOver);
-						GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-					}
-				}
-			}
-		}
-		else
-		{
-			SetWaveState(EWaveState::GameOver);
-			GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+			RestartPlayer(PC);
 		}
 	}
+
 }
 
 void ASCGameMode::SetWaveState(EWaveState NewWaveState)
@@ -119,5 +114,28 @@ void ASCGameMode::SetWaveState(EWaveState NewWaveState)
 	{
 		MyGameState->SetWaveState(NewWaveState);
 	}
+}
+
+void ASCGameMode::CheckGameOver()
+{
+	UE_LOG(LogTemp, Warning, TEXT("CHECKING GAME OVER !"))
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (PC && PC->GetPawn())
+		{
+			// A player is still alive.
+			GetWorld()->GetTimerManager().SetTimer(ResPawnPlayer_TimerHandle, this, &ASCGameMode::RestartDeadPlayers, 10);
+			return;
+		}
+	}
+	// No player alive
+	GameOver();
+}
+
+void ASCGameMode::GameOver()
+{
+	SetWaveState(EWaveState::GameOver);
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 
