@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "CSExplosiveBarrel.generated.h"
 
+class USCHealthComponent;
+
 UCLASS()
 class COOPSHOOTER_API ACSExplosiveBarrel : public AActor
 {
@@ -18,7 +20,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UStaticMeshComponent* MeshComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class USCHealthComponent* HealthComponent;
+		USCHealthComponent* HealthComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class URadialForceComponent* RadialForceComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")

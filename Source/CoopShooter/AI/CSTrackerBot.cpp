@@ -41,9 +41,9 @@ ACSTrackerBot::ACSTrackerBot()
 	CollisionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	CollisionSphere->SetGenerateOverlapEvents(true);
 
-	AudioComp = CreateDefaultSubobject <UAudioComponent>(TEXT("AudioComponent"));
-
 	HealthComp = CreateDefaultSubobject<USCHealthComponent>(TEXT("HealthComp"));
+
+	AudioComp = CreateDefaultSubobject <UAudioComponent>(TEXT("AudioComponent"));
 
 	bUseVelocityChange = true;
 	MovementForce = 1000;
@@ -59,6 +59,9 @@ ACSTrackerBot::ACSTrackerBot()
 void ACSTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!ensure(HealthComp)) { return; }
+
 	HealthComp->OnHealthChanged.AddDynamic(this, &ACSTrackerBot::HandleTakeDamage);
 	
 	if (GetLocalRole() == ROLE_Authority)

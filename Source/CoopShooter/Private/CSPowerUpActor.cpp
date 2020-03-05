@@ -5,6 +5,7 @@
 #include "CoopShooter/Public/CSCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PointLightComponent.h"
+#include "CoopShooter/Components/SCHealthComponent.h"
 
 // Sets default values
 ACSPowerUpActor::ACSPowerUpActor()
@@ -37,6 +38,12 @@ void ACSPowerUpActor::OnTickPowerUp()
 	TicksProcessed++;
 
 	OnPowerUpTicked();
+
+	if (CurrentActor->GetLocalRole() == ROLE_Authority)
+	{
+		ACSCharacter* PlayerPawn = Cast<ACSCharacter>(CurrentActor);
+		PlayerPawn->HealthComp->OnRep_Health(0);
+	}
 
 	if (TicksProcessed >= TotalNumberOfTicks)
 	{

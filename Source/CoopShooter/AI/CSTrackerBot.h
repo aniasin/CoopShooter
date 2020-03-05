@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "CSTrackerBot.generated.h"
 
+class USCHealthComponent;
+
 UCLASS()
 class COOPSHOOTER_API ACSTrackerBot : public APawn
 {
@@ -25,7 +27,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
 	class UStaticMeshComponent* MeshComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class USCHealthComponent* HealthComp;
+		USCHealthComponent* HealthComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class USphereComponent* CollisionSphere;
 	UPROPERTY(VisibleDefaultsOnly, Category = "Components")

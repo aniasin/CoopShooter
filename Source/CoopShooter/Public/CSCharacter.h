@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CSCharacter.generated.h"
 
+class USCHealthComponent;
 
 UCLASS()
 class COOPSHOOTER_API ACSCharacter : public ACharacter
@@ -16,14 +17,14 @@ public:
 	// Sets default values for this character's properties
 	ACSCharacter();
 
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class UCameraComponent* Camera;
+		class UCameraComponent* Camera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class USCHealthComponent* HealthComp;
+		USCHealthComponent* HealthComp;
 
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

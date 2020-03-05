@@ -28,6 +28,8 @@ void ACSExplosiveBarrel::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!ensure(HealthComponent)) { return; }
+
 	HealthComponent->OnHealthChanged.AddDynamic(this, &ACSExplosiveBarrel::OnHealthChanged);
 	
 }

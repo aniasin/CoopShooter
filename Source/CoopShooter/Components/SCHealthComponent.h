@@ -10,6 +10,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSignature, USCHealthComponent*, HealthComp, float, CurrentHealth, float, HealthDelta,
 const class UDamageType*, DamageType, class AController*, InstigatedBy, AActor*, DamageCauser);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+
 UCLASS( ClassGroup=(COOP), meta=(BlueprintSpawnableComponent) )
 class COOPSHOOTER_API USCHealthComponent : public UActorComponent
 {
@@ -19,12 +21,12 @@ public:
 	// Sets default values for this component's properties
 	USCHealthComponent();
 
+	UPROPERTY(BlueprintReadOnly, Category = "HealthComponent")
+	bool bIsDead;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-		void OnRep_Health(float OldHealth);
 
 	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadWrite, Category = "HealthComponent")
 		float CurrentHealth;
@@ -39,4 +41,10 @@ protected:
 public:	
 	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FOnHealthChangedSignature OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+		FOnDeath OnDeathEvent;
+
+	UFUNCTION()
+		void OnRep_Health(float OldHealth);
 };

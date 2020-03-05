@@ -29,13 +29,34 @@ ACSCharacter::ACSCharacter()
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->bUsePawnControlRotation = true;
 
-	HealthComp = CreateDefaultSubobject<USCHealthComponent>(TEXT("HealthComp"));
-
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	Camera->SetupAttachment(SpringArm);
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
+
+	HealthComp = CreateDefaultSubobject<USCHealthComponent>(TEXT("HealthComp"));
+}
+
+// Called to bind functionality to input
+void ACSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &ACSCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ACSCharacter::MoveRight);
+
+	PlayerInputComponent->BindAxis("LookUp", this, &ACSCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Turn", this, &ACSCharacter::AddControllerYawInput);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ACSCharacter::BeginCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ACSCharacter::EndCrouch);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACSCharacter::StartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACSCharacter::StopJump);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACSCharacter::Aim);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACSCharacter::StopAim);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACSCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ACSCharacter::StopFire);
 }
 
 // Called when the game starts or when spawned
@@ -133,27 +154,6 @@ void ACSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-// Called to bind functionality to input
-void ACSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ACSCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ACSCharacter::MoveRight);
-
-	PlayerInputComponent->BindAxis("LookUp", this, &ACSCharacter::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("Turn", this, &ACSCharacter::AddControllerYawInput);
-
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ACSCharacter::BeginCrouch);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ACSCharacter::EndCrouch);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACSCharacter::StartJump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACSCharacter::StopJump);
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACSCharacter::Aim);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACSCharacter::StopAim);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACSCharacter::Fire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ACSCharacter::StopFire);
 }
 
 FVector ACSCharacter::GetPawnViewLocation() const

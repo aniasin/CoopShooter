@@ -46,10 +46,16 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
 
+	OnRep_Health(CurrentHealth);
+
+	bIsDead = CurrentHealth <= 0;
+
 	UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(CurrentHealth), *GetOwner()->GetName())
 
-	if (CurrentHealth <= 0)
+	if (CurrentHealth <= 0 || bIsDead)
 	{
+		OnDeathEvent.Broadcast();
+
 		ASCGameMode* GM = Cast<ASCGameMode>(GetWorld()->GetAuthGameMode());
 		if (GM)
 		{
