@@ -57,6 +57,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		class UParticleSystem* TracerEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	float WeaponRange;
 
 	void PlayFireEffects(FVector Endpoint);
 	void PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint);

@@ -31,6 +31,7 @@ ACSWeapon::ACSWeapon()
 
 	BaseDamage = 20.0f;
 	RateOfFire = 600.0f;
+	WeaponRange = 10000;
 
 	SetReplicates(true);
 }
@@ -61,7 +62,7 @@ void ACSWeapon::Fire()
 
 	FVector ShotDirection = EyeRotation.Vector();
 
-	FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
+	FVector TraceEnd = EyeLocation + (ShotDirection * WeaponRange);
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(OwnerActor);

@@ -64,6 +64,7 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 	//Retrieving perceived actors
 	TArray<AActor*> SeenActors;
 	PerceptionComponent->GetCurrentlyPerceivedActors(TSubclassOf<UAISense_Sight>(), SeenActors);
+	
 
 	// Numbers of seen actors and if they enter or exit view
 	int32 NumberOfActorsSeen = SeenActors.Num();
@@ -85,8 +86,8 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 	{
 		ClearFocus(EAIFocusPriority::Default);
 		// set last Player direction
-		LastKnownPlayerDirection = Player->GetVelocity().GetUnsafeNormal() * 1000;
-		DrawDebugSphere(GetWorld(), LastKnownPlayerDirection, 100, 12, FColor::Red, false, 5, 1);
+		LastKnownPlayerDirection = Player->GetVelocity().GetUnsafeNormal() * 2500;
+		DrawDebugSphere(GetWorld(), LastKnownPlayerDirection, 200, 12, FColor::Red, false, 5, 5);
 
 		UE_LOG(LogTemp, Warning, TEXT("%s LOST SIGHT WITH %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
