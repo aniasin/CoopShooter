@@ -13,6 +13,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "DrawDebugHelpers.h"
 
 
 
@@ -48,6 +49,7 @@ void ACSAIController::OnPossess(APawn* InPawn)
 	if (AICharacter && BehaviorTree)
 	{
 		RunBehaviorTree(BehaviorTree);
+		BlackboardComponent = GetBlackboardComponent();
 	}
 	if (!BehaviorTree) { UE_LOG(LogTemp, Warning, TEXT("No behavior tree set in %s !"), *AICharacter->GetName()) }
 
@@ -67,20 +69,28 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 	int32 NumberOfActorsSeen = SeenActors.Num();
 
 	LastKnownPlayerPosition = Stimulus.StimulusLocation;
-	bCanSeeActor = Stimulus.WasSuccessfullySensed();
+	bCanSeePlayer = Stimulus.WasSuccessfullySensed();
 
 	ACSCharacter* Player = Cast<ACSCharacter>(Actor);
 
 	// Gain Sight
-	if (Player && bCanSeeActor)
+	if (Player && bCanSeePlayer)
 	{
+		CurrentTargetActor = Player;
+		SetFocus(CurrentTargetActor);
 		UE_LOG(LogTemp, Warning, TEXT("%s GAIN SIGHT %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
 	// Sight is lost
-	if (Player && !bCanSeeActor)
+	if (Player && !bCanSeePlayer)
 	{
+		ClearFocus(EAIFocusPriority::Default);
+		// set last Player direction
+		LastKnownPlayerDirection = Player->GetVelocity().GetUnsafeNormal() * 1000;
+		DrawDebugSphere(GetWorld(), LastKnownPlayerDirection, 100, 12, FColor::Red, false, 5, 1);
+
 		UE_LOG(LogTemp, Warning, TEXT("%s LOST SIGHT WITH %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
+	BlackboardComponent->SetValueAsObject("TargetActor", CurrentTargetActor);
 }
 
 ETeamAttitude::Type ACSAIController::GetTeamAttitudeTowards(const AActor& Other) const
@@ -94,4 +104,5 @@ ETeamAttitude::Type ACSAIController::GetTeamAttitudeTowards(const AActor& Other)
 	}
 	return ETeamAttitude::Neutral;
 }
+
 

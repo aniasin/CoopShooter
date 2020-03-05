@@ -46,9 +46,13 @@ public:
 	ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other)const override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-		bool bCanSeeActor = false;
+		bool bCanSeePlayer = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
 		FVector LastKnownPlayerPosition;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+	FVector LastKnownPlayerDirection;
+
+	AActor* CurrentTargetActor;
 
 protected:
 	void OnPossess(APawn* InPawn);
