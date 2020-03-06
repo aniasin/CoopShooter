@@ -27,6 +27,9 @@ public:
 	void AIFire();
 	void AIStopFire();
 
+	UPROPERTY(EditAnywhere, Category = "Player")
+	bool bIsAiControlled;
+
 
 protected:
 	// Called when the game starts or when spawned

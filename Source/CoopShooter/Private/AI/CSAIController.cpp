@@ -34,6 +34,10 @@ ACSAIController::ACSAIController()
 	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACSAIController::OnTargetPerceptionUpdate);
+
+
+	// Assign this controller to team 10
+	SetGenericTeamId(FGenericTeamId(10));
 }
 
 ETeamAttitude::Type ACSAIController::GetTeamAttitudeTowards(const AActor& Other) const
@@ -58,6 +62,7 @@ void ACSAIController::OnPossess(APawn* InPawn)
 	HearingConfig->HearingRange = HearingRange;
 
 	AICharacter = Cast<ACSCharacter>(InPawn);
+	AICharacter->bIsAiControlled = true;
 
 	if (AICharacter && BehaviorTree)
 	{
@@ -66,8 +71,6 @@ void ACSAIController::OnPossess(APawn* InPawn)
 	}
 	if (!BehaviorTree) { UE_LOG(LogTemp, Warning, TEXT("No behavior tree set in %s !"), *AICharacter->GetName()) }
 
-	// Assign this controller to team 10
-	SetGenericTeamId(FGenericTeamId(10));
 }
 
 void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus)

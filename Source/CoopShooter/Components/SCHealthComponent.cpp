@@ -59,11 +59,6 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 {
 	if (Damage <= 0 || CurrentHealth <= 0) { return; }
 
-	if (IsFriendly(DamageCauser, DamagedActor) && DamageCauser != DamagedActor)
-	{
-		return;
-	}
-
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
 

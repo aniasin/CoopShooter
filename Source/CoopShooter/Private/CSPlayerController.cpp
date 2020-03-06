@@ -6,11 +6,11 @@
 
 ACSPlayerController::ACSPlayerController()
 {
-
+	// Assign this controller to team 1
+	SetGenericTeamId(FGenericTeamId(1));
 }
 
 void ACSPlayerController::BeginPlay()
 {
-	// Assign this controller to team 1
-	SetGenericTeamId(FGenericTeamId(1));
+
 }

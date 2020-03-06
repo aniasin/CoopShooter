@@ -7,6 +7,7 @@
 #include "CoopShooter/Public/CSGameStateBase.h"
 #include "CoopShooter/Public/CSCharacter.h"
 #include "CoopShooter/Public/CSPlayerState.h"
+#include "CoopShooter/Public/AI/CSAIController.h"
 #include "Engine/World.h"
 
 ASCGameMode::ASCGameMode()
@@ -82,9 +83,10 @@ void ASCGameMode::CheckWaveState()
 void ASCGameMode::ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController)
 {
 
-	ACSCharacter* Player = Cast<ACSCharacter>(Victim);
+	ACSCharacter* PlayerBase = Cast<ACSCharacter>(Victim);
+	
 	// Victim is Player
-	if (Player)
+	if (PlayerBase && !PlayerBase->bIsAiControlled)
 	{
 		CheckGameOver();
 	}
