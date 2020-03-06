@@ -38,6 +38,7 @@ bool USCHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
 	{
 		return false;
 	}
+
 	USCHealthComponent* TestHealthCompA = Cast<USCHealthComponent>(ActorA->GetComponentByClass(USCHealthComponent::StaticClass()));
 	USCHealthComponent* TestHealthCompB = Cast<USCHealthComponent>(ActorB->GetComponentByClass(USCHealthComponent::StaticClass()));
 	if (!TestHealthCompA || !TestHealthCompB)

@@ -74,6 +74,9 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 {
 	UE_LOG(LogTemp, Warning, TEXT("Perception Update !"))
 	if (!AICharacter) { return; }
+
+	Stimulus.SetExpirationAge(TimeToSearch);
+
 	//Retrieving perceived actors
 	TArray<AActor*> SeenActors;
 	PerceptionComponent->GetCurrentlyPerceivedActors(TSubclassOf<UAISense_Sight>(), SeenActors);
@@ -98,8 +101,11 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 	// Sight is lost
 	if (Player && !bCanSeePlayer)
 	{
-		// set a timer after what Bot will discard target
-		GetWorld()->GetTimerManager().SetTimer(FDiscardTarget_TimerHandle, this, &ACSAIController::DiscardTarget, TimeToSearch);
+		if (Stimulus.IsExpired())
+		{
+			DiscardTarget();
+		}
+	
 		// set last Player direction
 		LastKnownPlayerDirection = Player->GetVelocity().GetUnsafeNormal() * 2500;
 		DrawDebugSphere(GetWorld(), LastKnownPlayerDirection, 200, 12, FColor::Red, false, 5, 5);
