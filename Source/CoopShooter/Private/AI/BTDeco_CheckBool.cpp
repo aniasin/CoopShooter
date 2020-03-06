@@ -11,5 +11,5 @@ bool UBTDeco_CheckBool::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!BlackboardComponent || !AIController) { return false; }
 
-	return BlackboardComponent->GetValueAsBool(BoolToCheck.SelectedKeyName);
+	return BlackboardComponent->GetValueAsBool(Bool.SelectedKeyName);
 }

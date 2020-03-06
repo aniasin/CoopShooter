@@ -16,8 +16,8 @@ class COOPSHOOTER_API UBTDeco_CheckBool : public UBTDecorator
 	
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = Blackboard)
-		FBlackboardKeySelector BoolToCheck;
+	UPROPERTY(VisibleAnywhere, Category = "Blackboard")
+		FBlackboardKeySelector Bool;
 
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)const override;

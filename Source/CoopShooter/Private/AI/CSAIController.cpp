@@ -106,11 +106,7 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 
 		UE_LOG(LogTemp, Warning, TEXT("%s LOST SIGHT WITH %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
-	if (!Player)
-	{
-		BlackboardComponent->ClearValue("TargetActor");
-		ClearFocus(EAIFocusPriority::Default);
-	}
+	BlackboardComponent->SetValueAsBool("bCanSeePlayer", bCanSeePlayer);
 }
 
 void ACSAIController::DiscardTarget()

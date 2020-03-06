@@ -198,6 +198,11 @@ void ACSTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
+	if (HealthComp->IsFriendly(OtherActor, this))
+	{
+		return;
+	}
+
 	ACSCharacter* Player = Cast<ACSCharacter>(OtherActor);
 	if (Player && !bStartedSelfDestroy)
 	{

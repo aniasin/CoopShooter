@@ -180,6 +180,19 @@ bool ACSCharacter::ClientChangeMaxWalkSpeed_Validate(float NewSpeed)
 	return true;
 }
 
+////////// AI
+void ACSCharacter::AIFire()
+{
+	Fire();
+	GetWorld()->GetTimerManager().SetTimer(FAIFire_TimerHandle, this, &ACSCharacter::AIStopFire, 1, false);
+}
+
+void ACSCharacter::AIStopFire()
+{
+	StopFire();
+}
+
+
 void ACSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

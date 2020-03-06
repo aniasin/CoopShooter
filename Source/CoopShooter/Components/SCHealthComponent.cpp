@@ -13,7 +13,7 @@ USCHealthComponent::USCHealthComponent()
 {
 	MaxHealth = 100.0f;
 
-
+	TeamID = 255;
 }
 
 // Called when the game starts
@@ -32,6 +32,21 @@ void USCHealthComponent::BeginPlay()
 	}
 	CurrentHealth = MaxHealth;}
 
+bool USCHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
+{
+	if (!ActorA || !ActorB)
+	{
+		return false;
+	}
+	USCHealthComponent* TestHealthCompA = Cast<USCHealthComponent>(ActorA->GetComponentByClass(USCHealthComponent::StaticClass()));
+	USCHealthComponent* TestHealthCompB = Cast<USCHealthComponent>(ActorB->GetComponentByClass(USCHealthComponent::StaticClass()));
+	if (!TestHealthCompA || !TestHealthCompB)
+	{
+		return false;
+	}
+	return TestHealthCompA->TeamID == TestHealthCompB->TeamID;
+}
+
 void USCHealthComponent::OnRep_Health(float OldHealth)
 {
 	float Damage = CurrentHealth - OldHealth;
@@ -42,6 +57,11 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (Damage <= 0 || CurrentHealth <= 0) { return; }
+
+	if (IsFriendly(DamageCauser, DamagedActor) && DamageCauser != DamagedActor)
+	{
+		return;
+	}
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);

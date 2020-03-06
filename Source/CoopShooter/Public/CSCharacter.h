@@ -24,6 +24,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USCHealthComponent* HealthComp;
 
+	void AIFire();
+	void AIStopFire();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,6 +43,7 @@ protected:
 	void StopAim();
 	void Fire();
 	void StopFire();
+
 
 	UPROPERTY(Replicated)
 		class ACSWeapon* CurrentWeapon;
@@ -75,5 +80,7 @@ public:
 		void ClientChangeMaxWalkSpeed(float NewSpeed);
 
 private:
+
+	FTimerHandle FAIFire_TimerHandle;
 
 };

@@ -24,6 +24,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "HealthComponent")
 	bool bIsDead;
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealthComponent")
+		uint8 TeamID;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -44,6 +48,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Event")
 		FOnDeath OnDeathEvent;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthCOmponent")
+	static bool IsFriendly(AActor* ActorA, AActor* ActorB);
 
 	UFUNCTION()
 		void OnRep_Health(float OldHealth);

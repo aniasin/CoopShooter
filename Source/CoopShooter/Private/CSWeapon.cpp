@@ -32,6 +32,7 @@ ACSWeapon::ACSWeapon()
 	BaseDamage = 20.0f;
 	RateOfFire = 600.0f;
 	WeaponRange = 10000;
+	BulletSpread = 1;
 
 	SetReplicates(true);
 }
@@ -62,6 +63,18 @@ void ACSWeapon::Fire()
 
 	FVector ShotDirection = EyeRotation.Vector();
 
+	// Bullet Spread
+if (OwnerActor->GetVelocity().Size() > 0)
+{
+	BulletSpread = 4;
+}
+else
+{
+	BulletSpread = 0;
+}
+	float HalfRad = FMath::DegreesToRadians(BulletSpread);
+	ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+
 	FVector TraceEnd = EyeLocation + (ShotDirection * WeaponRange);
 
 	FCollisionQueryParams QueryParams;
@@ -88,7 +101,7 @@ void ACSWeapon::Fire()
 			ActualDamage *= 4.0f;
 		}
 
-		UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, OwnerActor->GetInstigatorController(), this, DamageType);
+		UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, OwnerActor->GetInstigatorController(), OwnerActor, DamageType);
 		PlayImpact(SurfaceType, Hit.ImpactPoint);
 
 		TracerEndPoint = Hit.ImpactPoint;
