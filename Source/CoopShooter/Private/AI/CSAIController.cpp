@@ -24,10 +24,6 @@ ACSAIController::ACSAIController()
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
 	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(FName("HearingConfig"));
 
-	// Configure the sight and hearing sense
-	SightConfig->SightRadius = SightRange;
-	SightConfig->LoseSightRadius = LoseSightRange;
-	HearingConfig->HearingRange = HearingRange;
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
@@ -40,9 +36,26 @@ ACSAIController::ACSAIController()
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACSAIController::OnTargetPerceptionUpdate);
 }
 
+ETeamAttitude::Type ACSAIController::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	if (const APawn* OtherPawn = Cast<APawn>(&Other))
+	{
+		if (const IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(OtherPawn->GetController()))
+		{
+			return Super::GetTeamAttitudeTowards(*OtherPawn->GetController());
+		}
+	}
+	return ETeamAttitude::Neutral;
+}
+
 void ACSAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	// Configure the sight and hearing sense
+	SightConfig->SightRadius = SightRange;
+	SightConfig->LoseSightRadius = LoseSightRange;
+	HearingConfig->HearingRange = HearingRange;
 
 	AICharacter = Cast<ACSCharacter>(InPawn);
 
@@ -78,32 +91,33 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 	if (Player && bCanSeePlayer)
 	{
 		CurrentTargetActor = Player;
-		SetFocus(CurrentTargetActor);
+		SetFocus(CurrentTargetActor, EAIFocusPriority::Default);
+		BlackboardComponent->SetValueAsObject("TargetActor", CurrentTargetActor);
 		UE_LOG(LogTemp, Warning, TEXT("%s GAIN SIGHT %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
 	// Sight is lost
 	if (Player && !bCanSeePlayer)
 	{
-		ClearFocus(EAIFocusPriority::Default);
+		// set a timer after what Bot will discard target
+		GetWorld()->GetTimerManager().SetTimer(FDiscardTarget_TimerHandle, this, &ACSAIController::DiscardTarget, TimeToSearch);
 		// set last Player direction
 		LastKnownPlayerDirection = Player->GetVelocity().GetUnsafeNormal() * 2500;
 		DrawDebugSphere(GetWorld(), LastKnownPlayerDirection, 200, 12, FColor::Red, false, 5, 5);
 
 		UE_LOG(LogTemp, Warning, TEXT("%s LOST SIGHT WITH %s !"), *GetPawn()->GetName(), *Player->GetName())
 	}
-	BlackboardComponent->SetValueAsObject("TargetActor", CurrentTargetActor);
+	if (!Player)
+	{
+		BlackboardComponent->ClearValue("TargetActor");
+		ClearFocus(EAIFocusPriority::Default);
+	}
 }
 
-ETeamAttitude::Type ACSAIController::GetTeamAttitudeTowards(const AActor& Other) const
+void ACSAIController::DiscardTarget()
 {
-	if (const APawn* OtherPawn = Cast<APawn>(&Other))
-	{
-		if (const IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(OtherPawn->GetController()))
-		{
-			return Super::GetTeamAttitudeTowards(*OtherPawn->GetController());
-		}
-	}
-	return ETeamAttitude::Neutral;
+	BlackboardComponent->ClearValue("TargetActor");
+	ClearFocus(EAIFocusPriority::Default);
+	GetWorld()->GetTimerManager().ClearTimer(FDiscardTarget_TimerHandle);
 }
 
 

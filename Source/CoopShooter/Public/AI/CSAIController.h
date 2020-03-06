@@ -30,14 +30,20 @@ class COOPSHOOTER_API ACSAIController : public AAIController
 	UAISenseConfig_Hearing* HearingConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-		float SightRange = 2000.f;
+		float SightRange = 5000;
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-		float LoseSightRange = 2500.f;
+		float LoseSightRange = 6000;
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-		float HearingRange = 1000.f;
+		float HearingRange = 2000;
 	UPROPERTY(EditAnywhere, Category = "AI")
 		UBehaviorTree* BehaviorTree;
 	UBlackboardComponent* BlackboardComponent;
+
+	FTimerHandle FDiscardTarget_TimerHandle;
+	// How long Bot will search if no sight
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float TimeToSearch = 10;
+	void DiscardTarget();
 
 	UFUNCTION()
 		void OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus);
