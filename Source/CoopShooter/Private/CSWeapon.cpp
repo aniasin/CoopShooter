@@ -147,19 +147,26 @@ void ACSWeapon::StopFire()
 
 void ACSWeapon::PlayFireEffects(FVector EndPoint)
 {
-	if (!MuzzleEffect) { return; }
-	UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
-
-	if (!FireSound) { return; }
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
+	if (MuzzleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+	}
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
+	}
+	if (ShellSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShellSound, GetActorLocation());
+	}
 
 	FVector MuzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 
-	if (!TracerEffect) { return; }
-	UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzleLocation);
-
-	if (!TracerComp) { return; }
-	TracerComp->SetVectorParameter(TracerTargetName, EndPoint);
+	if (TracerEffect)
+	{
+		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzleLocation);
+		TracerComp->SetVectorParameter(TracerTargetName, EndPoint);
+	}
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (!OwnerPawn) { return; }
@@ -171,24 +178,33 @@ void ACSWeapon::PlayFireEffects(FVector EndPoint)
 void ACSWeapon::PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint)
 {
 	UParticleSystem* SelectedEffect = nullptr;
+	USoundCue* SelectedSound = nullptr;
 	switch (SurfaceType)
 	{
 	case SURFACE_FLESHDEFAULT:
 	case SURFACE_FLESHVULNERABLE:
 		SelectedEffect = FleshImpactEffect;
+		SelectedSound = HitSoundFlesh;
 		break;
 	case SURFACE_EXPLOSIVE:
 		SelectedEffect = ExplosiveImpactEffect;
 		break;
 	default:
 		SelectedEffect = DefaultImpactEffect;
+		SelectedSound = HitSoundConcrete;
 		break;
 	}
-	if (!SelectedEffect) { return; }
 	FVector ShotDirection = ImpactPoint - MeshComp->GetSocketLocation(MuzzleSocketName);
 	ShotDirection.Normalize();
 
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
+	if (SelectedEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
+	}
+	if (SelectedSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SelectedSound, ImpactPoint);
+	}
 }
 
 void ACSWeapon::OnRep_HitScanTrace()

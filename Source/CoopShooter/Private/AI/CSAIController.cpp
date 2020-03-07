@@ -13,6 +13,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "CoopShooter/Public/SCGameMode.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -68,6 +69,11 @@ void ACSAIController::OnPossess(APawn* InPawn)
 	{
 		RunBehaviorTree(BehaviorTree);
 		BlackboardComponent = GetBlackboardComponent();
+		ASCGameMode* GM = Cast<ASCGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->OnGameOver.AddDynamic(this, &ACSAIController::GameIsOver);
+		}
 	}
 	if (!BehaviorTree) { UE_LOG(LogTemp, Warning, TEXT("No behavior tree set in %s !"), *AICharacter->GetName()) }
 
@@ -125,4 +131,9 @@ void ACSAIController::DiscardTarget()
 	GetWorld()->GetTimerManager().ClearTimer(FDiscardTarget_TimerHandle);
 }
 
+void ACSAIController::GameIsOver()
+{
+	BlackboardComponent->SetValueAsBool("IsGameOver", true);
+	UE_LOG(LogTemp, Warning, TEXT("GAME IS OVER !"))
+}
 

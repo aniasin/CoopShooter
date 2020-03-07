@@ -16,7 +16,6 @@ bool UBTD_CheckReachableDistance::CalculateRawConditionValue(UBehaviorTreeCompon
 
 	if (!TargetActor) { return false; }
 
-	UE_LOG(LogTemp, Warning, TEXT("Checking distance..."))
 	FVector AiPosition = AIController->GetPawn()->GetActorLocation();
 	FVector TargetPosition = TargetActor->GetActorLocation();
 
@@ -24,12 +23,10 @@ bool UBTD_CheckReachableDistance::CalculateRawConditionValue(UBehaviorTreeCompon
 
 	if (Distance < DistanceToCheck)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TRUE..."))
 		return true;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FALSE..."))
 		return false;
 	}
 

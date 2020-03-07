@@ -140,6 +140,7 @@ void ASCGameMode::CheckGameOver()
 void ASCGameMode::GameOver()
 {
 	SetWaveState(EWaveState::GameOver);
+	OnGameOver.Broadcast();
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 

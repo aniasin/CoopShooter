@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SCGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameOver);
 
 enum class EWaveState : uint8;
 /**
@@ -24,6 +25,11 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
 		void K2_ActorKilled(AActor* Killer, AActor* Victim, AController* InstigatorController);
+
+	UPROPERTY(BlueprintReadOnly, Category = "GameMode")
+	bool bIsGameOver;
+
+	FOnGameOver OnGameOver;
 
 protected:
 
@@ -58,11 +64,10 @@ protected:
 		int32 NumberOfWaves;
 
 	void CheckGameOver();
+	UFUNCTION()
 	void GameOver();
 
 private:
-
-	bool bIsGameOver;
 
 	int32 NumberOfBotsSpawned;
 	int32 CurrentNumberOfWaves;

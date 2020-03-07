@@ -63,4 +63,7 @@ public:
 protected:
 	void OnPossess(APawn* InPawn);
 
+	UFUNCTION()
+	void GameIsOver();
+
 };

@@ -125,7 +125,7 @@ void ACSCharacter::StopAim()
 
 void ACSCharacter::Fire()
 {
-	if (!CurrentWeapon) { return; }
+	if (!CurrentWeapon || bIsDead) { return; }
 	CurrentWeapon->StartFire();
 }
 
@@ -183,6 +183,7 @@ bool ACSCharacter::ClientChangeMaxWalkSpeed_Validate(float NewSpeed)
 ////////// AI
 void ACSCharacter::AIFire()
 {
+	if (!CurrentWeapon || bIsDead) { return; }
 	Fire();
 	GetWorld()->GetTimerManager().SetTimer(FAIFire_TimerHandle, this, &ACSCharacter::AIStopFire, 1, false);
 }
