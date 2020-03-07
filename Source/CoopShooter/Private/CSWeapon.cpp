@@ -15,6 +15,7 @@
 #include "CoopShooter/CoopShooter.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Sound/SoundCue.h"
 #include "Net/UnrealNetwork.h"
 
 static int32 DebugWeaponDrawing = 0;
@@ -148,6 +149,9 @@ void ACSWeapon::PlayFireEffects(FVector EndPoint)
 {
 	if (!MuzzleEffect) { return; }
 	UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+
+	if (!FireSound) { return; }
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
 
 	FVector MuzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 
