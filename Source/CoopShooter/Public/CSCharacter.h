@@ -30,6 +30,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player")
 	bool bIsAiControlled;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
+		void K2_UpdatedAmmo();
 
 protected:
 	// Called when the game starts or when spawned
@@ -46,7 +48,6 @@ protected:
 	void StopAim();
 	void Fire();
 	void StopFire();
-
 
 	UPROPERTY(Replicated)
 		class ACSWeapon* CurrentWeapon;
@@ -81,6 +82,9 @@ public:
 
 	UFUNCTION(Client, Reliable, WithValidation, BlueprintCallable, Category = "Event")
 		void ClientChangeMaxWalkSpeed(float NewSpeed);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	ACSWeapon* GetCurrentWeapon();
 
 private:
 

@@ -29,6 +29,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "GameMode")
 	bool bIsGameOver;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
+	void K2_PlayerRespawned(APlayerController* PC);
+
 	FOnGameOver OnGameOver;
 
 protected:

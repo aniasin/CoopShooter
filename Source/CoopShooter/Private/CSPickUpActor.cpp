@@ -6,6 +6,8 @@
 #include "Components/DecalComponent.h"
 #include "CoopShooter/Public/CSPowerUpActor.h"
 #include "CoopShooter/Public/CSCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 
@@ -57,6 +59,23 @@ void ACSPickUpActor::Respawn()
 
 }
 
+void ACSPickUpActor::PickUpEffects()
+{
+	if (PickUpSound)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Should Play SOUND %s!"), *PickUpSound->GetName())
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), PickUpSound, GetActorLocation());
+	}
+
+}
+
+void ACSPickUpActor::OnRep_PickedUp()
+{
+	if (!bIsPickedUp) {	return;	}
+	PickUpEffects();
+	bIsPickedUp = false;
+}
+
 void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -71,8 +90,15 @@ void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
 			SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			PowerUp->CurrentActor = OtherActor;
 			PowerUp->ActivatePowerUp();
+			bIsPickedUp = true;
+			Player->K2_UpdatedAmmo();
 		}
+		PickUpEffects();
 	}
+}
 
-
+void ACSPickUpActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACSPickUpActor, bIsPickedUp);
 }

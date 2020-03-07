@@ -99,6 +99,11 @@ void ACSAIController::OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimul
 
 	ACSCharacter* Player = Cast<ACSCharacter>(Actor);
 
+	if (Player->bIsDead)
+	{
+		return;
+	}
+
 	// Gain Sight
 	if (Player && bCanSeePlayer)
 	{

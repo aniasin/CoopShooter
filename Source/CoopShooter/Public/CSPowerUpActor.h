@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "CSPowerUpActor.generated.h"
 
+class USceneComponent;
+class UStaticMeshComponent;
+class UPointLightComponent;
+class URotatingMovementComponent;
+
 UCLASS()
 class COOPSHOOTER_API ACSPowerUpActor : public AActor
 {
@@ -17,13 +22,14 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-		class USceneComponent* SceneComp;
+		USceneComponent* SceneComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-		class UStaticMeshComponent* MeshComp;
+		UStaticMeshComponent* MeshComp;
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-		class UPointLightComponent* LightComp;
-
+		UPointLightComponent* LightComp;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		URotatingMovementComponent* RotatingMovementComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
 	float PowerUpInterval;
@@ -38,7 +44,6 @@ protected:
 		void OnTickPowerUp();
 
 public:	
-
 	void ActivatePowerUp();
 
 

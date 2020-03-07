@@ -5,6 +5,7 @@
 #include "CoopShooter/Public/CSCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PointLightComponent.h"
+#include "GameFramework/RotatingMovementComponent.h"
 #include "CoopShooter/Components/SCHealthComponent.h"
 
 // Sets default values
@@ -24,6 +25,10 @@ ACSPowerUpActor::ACSPowerUpActor()
 	LightComp->SetAttenuationRadius(200);
 	LightComp->CastShadows = false;
 	LightComp->SetIsReplicated(true);
+
+	RotatingMovementComp = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovementComp"));
+	RotatingMovementComp->RotationRate = FRotator(0, 100, 0);
+	RotatingMovementComp->bRotationInLocalSpace = true;
 
 
 	SetReplicates(true);

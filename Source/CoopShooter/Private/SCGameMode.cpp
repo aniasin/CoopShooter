@@ -88,6 +88,11 @@ void ASCGameMode::ActorKilled(AActor* Killer, AActor* Victim, AController* Insti
 	// Victim is Player
 	if (PlayerBase && !PlayerBase->bIsAiControlled)
 	{
+		ACSAIController* AIController = Cast<ACSAIController>(InstigatorController);
+		if (AIController)
+		{
+			AIController->DiscardTarget();
+		}
 		CheckGameOver();
 	}
 	// Victim is Bot
@@ -105,6 +110,7 @@ void ASCGameMode::RestartDeadPlayers()
 		if (PC && PC->GetPawn() == nullptr)
 		{
 			RestartPlayer(PC);
+			K2_PlayerRespawned(PC);
 		}
 	}
 

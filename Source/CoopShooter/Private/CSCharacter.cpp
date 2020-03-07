@@ -77,8 +77,13 @@ void ACSCharacter::BeginPlay()
 	CurrentWeapon = GetWorld()->SpawnActor<ACSWeapon>(StarterWeaponClass, FVector(0, 0, 0), FRotator(0, 0, 0), SpawnParams);
 		if (CurrentWeapon)
 		{
+			if (bIsAiControlled)
+			{
+				CurrentWeapon->DefaultBulletSpread = 10;
+			}
 			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
 			CurrentWeapon->SetOwner(this);
+
 		}
 	}
 }
@@ -141,6 +146,11 @@ void ACSCharacter::OnHealthChanged(USCHealthComponent* HealthComponent, float Cu
 		if (CurrentHealth <= 0 || bIsDead)
 		{
 			bIsDead = true;
+			if (CurrentWeapon)
+			{
+				CurrentWeapon->Destroy();
+				// TODO Spawn Weapon Pick up in place
+			}
 			GetMovementComponent()->StopMovementImmediately();
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -178,6 +188,11 @@ void ACSCharacter::ClientChangeMaxWalkSpeed_Implementation(float NewSpeed)
 bool ACSCharacter::ClientChangeMaxWalkSpeed_Validate(float NewSpeed)
 {
 	return true;
+}
+
+ACSWeapon* ACSCharacter::GetCurrentWeapon()
+{
+	return CurrentWeapon;
 }
 
 ////////// AI

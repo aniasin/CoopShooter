@@ -16,6 +16,8 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "Sound/SoundCue.h"
+#include "CoopShooter/Public/CSCharacter.h"
+#include "Components/PrimitiveComponent.h"
 #include "Net/UnrealNetwork.h"
 
 static int32 DebugWeaponDrawing = 0;
@@ -33,7 +35,9 @@ ACSWeapon::ACSWeapon()
 	BaseDamage = 20.0f;
 	RateOfFire = 600.0f;
 	WeaponRange = 10000;
-	BulletSpread = 1;
+	DefaultBulletSpread = 1;
+	MaxAmmo = 300;
+	CurrentAmmo = 30;
 
 	SetReplicates(true);
 }
@@ -53,10 +57,22 @@ void ACSWeapon::Fire()
 		ServerFire();
 	}
 
+	if (CurrentAmmo <= 0) 
+	{
+		if (NoAmmoSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+			return;
+		}
+	}
+	CurrentAmmo--;
+
+	OnRep_Ammo();
 
 	AActor* OwnerActor = GetOwner();
-
 	LastFireTime = GetWorld()->GetTimeSeconds();
+
+
 
 	FVector EyeLocation;
 	FRotator EyeRotation;
@@ -65,15 +81,18 @@ void ACSWeapon::Fire()
 	FVector ShotDirection = EyeRotation.Vector();
 
 	// Bullet Spread
-if (OwnerActor->GetVelocity().Size() > 0)
-{
-	BulletSpread = 4;
-}
-else
-{
-	BulletSpread = 0;
-}
-	float HalfRad = FMath::DegreesToRadians(BulletSpread);
+	float BulletSpread = 0;
+	if (OwnerActor->GetVelocity().Size() > 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CURRENT BULLET SPREAD : %s (degrees)"), *FString::SanitizeFloat(DefaultBulletSpread))
+		BulletSpread = DefaultBulletSpread * 2;
+	}
+	else
+	{
+		BulletSpread = DefaultBulletSpread;
+	}
+
+	float HalfRad = FMath::DegreesToRadians(DefaultBulletSpread);
 	ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 
 	FVector TraceEnd = EyeLocation + (ShotDirection * WeaponRange);
@@ -207,6 +226,16 @@ void ACSWeapon::PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint)
 	}
 }
 
+void ACSWeapon::OnRep_Ammo()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnRepAMMO"))
+	ACSCharacter* CurrentCharacter = Cast<ACSCharacter>(GetOwner());
+	if (CurrentCharacter)
+	{
+		CurrentCharacter->K2_UpdatedAmmo();
+	}
+}
+
 void ACSWeapon::OnRep_HitScanTrace()
 {
 	// play cosmetics
@@ -218,4 +247,5 @@ void ACSWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ACSWeapon, HitScanTrace, COND_SkipOwner);
+	DOREPLIFETIME(ACSWeapon, CurrentAmmo);
 }

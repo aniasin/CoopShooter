@@ -29,6 +29,9 @@ class COOPSHOOTER_API ACSWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACSWeapon();
+
+	UFUNCTION()
+		void OnRep_Ammo();
 	
 protected:
 
@@ -40,6 +43,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	TSubclassOf<class UDamageType> DamageType;
 
+	UPROPERTY(EditDefaultsOnly, ReplicatedUsing= OnRep_Ammo, BlueprintReadWrite, Category = "Weapon")
+		int32 CurrentAmmo;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+		int32 MaxAmmo;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FName MuzzleSocketName;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
@@ -50,6 +58,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		class USoundCue* FireSound;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+		class USoundCue* NoAmmoSound;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		class USoundCue* ShellSound;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
@@ -68,9 +78,6 @@ protected:
 		class UParticleSystem* TracerEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float WeaponRange;
-	/* Bullet Spread in Degrees */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (ClampMin = 0.0f))
-		float BulletSpread;
 
 	void PlayFireEffects(FVector Endpoint);
 	void PlayImpact(EPhysicalSurface SurfaceType, FVector ImpactPoint);
@@ -103,6 +110,9 @@ protected:
 	FTimerHandle FireTimerHandle;
 
 public:
+	/* Bullet Spread in Degrees */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (ClampMin = 0.0f))
+		float DefaultBulletSpread;
 
 	void StartFire();
 	void StopFire();

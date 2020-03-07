@@ -43,7 +43,6 @@ class COOPSHOOTER_API ACSAIController : public AAIController
 	// How long Bot will search if no sight
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float TimeToSearch = 10;
-	void DiscardTarget();
 
 	UFUNCTION()
 		void OnTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus);
@@ -59,6 +58,7 @@ public:
 	FVector LastKnownPlayerDirection;
 
 	AActor* CurrentTargetActor;
+	void DiscardTarget();
 
 protected:
 	void OnPossess(APawn* InPawn);

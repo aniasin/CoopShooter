@@ -16,11 +16,19 @@ public:
 	ACSPickUpActor();
 
 
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
+		class USoundCue* PickUpSound;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Respawn();
+	void PickUpEffects();
+
+	UPROPERTY(ReplicatedUsing=OnRep_PickedUp, BlueprintReadOnly, Category = "PowerUp")
+	bool bIsPickedUp;
 
 UPROPERTY(VisibleAnywhere, Category = "Components")
 	class USphereComponent* SphereComp;
@@ -37,6 +45,9 @@ FTimerHandle RespawnTimerHandle;
 class ACSPowerUpActor* PowerUp;
 
 public:	
+
+	UFUNCTION()
+	void OnRep_PickedUp();
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActoroverride);
 
