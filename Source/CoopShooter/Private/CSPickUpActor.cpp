@@ -56,6 +56,7 @@ void ACSPickUpActor::Respawn()
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	PowerUp = GetWorld()->SpawnActor<ACSPowerUpActor>(PowerUpClass, GetActorTransform(), SpawnParams);
 	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+	bIsPickedUp = false;
 
 }
 
@@ -73,7 +74,6 @@ void ACSPickUpActor::OnRep_PickedUp()
 {
 	if (!bIsPickedUp) {	return;	}
 	PickUpEffects();
-	bIsPickedUp = false;
 }
 
 void ACSPickUpActor::NotifyActorBeginOverlap(AActor* OtherActor)
