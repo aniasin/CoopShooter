@@ -81,6 +81,11 @@ void USCHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 
 }
 
+float USCHealthComponent::GetCurrentHealth()
+{
+	return CurrentHealth;
+}
+
 void USCHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

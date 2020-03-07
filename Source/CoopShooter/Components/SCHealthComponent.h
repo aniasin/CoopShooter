@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealthComponent")
 		uint8 TeamID;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
+	float GetCurrentHealth();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

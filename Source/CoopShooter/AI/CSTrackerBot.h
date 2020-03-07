@@ -17,9 +17,6 @@ public:
 	// Sets default values for this pawn's properties
 	ACSTrackerBot();
 
-	UFUNCTION(BlueprintCallable)
-		TArray<class ACSCharacter*> SortPlayersByDistance(TArray<ACSCharacter*> PlayerToSort);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -73,8 +70,6 @@ protected:
 
 	bool bStartedSelfDestroy;
 
-	class ACSCharacter* BestTarget;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TrackeBot")
 		float Damage;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TrackeBot")
@@ -90,6 +85,9 @@ protected:
 
 
 	FTimerHandle BotTimerHandle;
+	FTimerHandle RefreshNavPath_TimerHandle;
+
+	void RefreshNav();
 
 public:	
 	// Called every frame

@@ -107,25 +107,34 @@ FVector ACSTrackerBot::GetNextPathPoint()
 		return GetActorLocation();
 	}
 
-	TArray<AActor*> SpottedPlayers;
-	TArray<ACSCharacter*>PlayersToSort;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACSCharacter::StaticClass(), SpottedPlayers);
-	if (SpottedPlayers.Num() > 0)
-	{
-		for (int32 i = 0; i < SpottedPlayers.Num(); i++)
+	AActor* BestTarget = nullptr;
+	float NearestTargetDistance = FLT_MAX;
+		for (TActorIterator<AActor> It(GetWorld()); It; ++It)
 		{
-			float Distance = FVector::Distance(SpottedPlayers[i]->GetActorLocation(), GetActorLocation());
-			ACSCharacter* PlayerCharacter = Cast<ACSCharacter>(SpottedPlayers[i]);
-			PlayerCharacter->DistanceToQuerier = Distance;
-			PlayersToSort.Add(PlayerCharacter);
+			AActor* TestActor = *It;
+			if (USCHealthComponent::IsFriendly(TestActor, this))
+			{
+				break;
+			}
+			USCHealthComponent* TestPawnHealthComp = Cast<USCHealthComponent>(TestActor->GetComponentByClass(USCHealthComponent::StaticClass()));
+			if (TestPawnHealthComp && TestPawnHealthComp->GetCurrentHealth() > 0.0f)
+			{
+				float Distance = FVector::Distance(this->GetActorLocation(), TestActor->GetActorLocation());
+
+				if (Distance < NearestTargetDistance)
+				{
+					BestTarget = TestActor;
+					NearestTargetDistance = Distance;
+				}
+			}
 		}
-		TArray<ACSCharacter*>PlayersSorted = SortPlayersByDistance(PlayersToSort);
-		BestTarget = PlayersSorted[0];
-	}
 
 	if (BestTarget)
 	{
 		UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), BestTarget);
+		
+		GetWorld()->GetTimerManager().ClearTimer(RefreshNavPath_TimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(RefreshNavPath_TimerHandle, this, &ACSTrackerBot::RefreshNav, 5);
 
 
 		if (NavPath->PathPoints.Num() > 1)
@@ -222,14 +231,9 @@ void ACSTrackerBot::NotifyActorEndOverlap(AActor* OtherActor)
 
 }
 
-// tools
-TArray<ACSCharacter*> ACSTrackerBot::SortPlayersByDistance(TArray<ACSCharacter*> PlayerToSort)
+void ACSTrackerBot::RefreshNav()
 {
-	auto SortPred = [](ACSCharacter& A, ACSCharacter& B)->bool
-	{
-		return(A.DistanceToQuerier) <= (B.DistanceToQuerier);
-	};
-	PlayerToSort.Sort(SortPred);
-
-	return PlayerToSort;
+	GetNextPathPoint();
 }
+
+
